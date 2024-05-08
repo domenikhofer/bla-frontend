@@ -28,7 +28,7 @@
 
             <a v-for="entry in category.entries" class="entry" :href="entry.url" target="_blank">
                 <span class="image">
-                    <img :src="entry.image" alt="">
+                    <img :src="`https://image.tmdb.org/t/p/w500/${entry.image}`" alt="">
                 </span>
             </a>
 
@@ -37,8 +37,12 @@
 
     <div class="pageActions fixed">
         <NuxtLink to="/" class="button">⬅️</NuxtLink>
-        <div v-if="category.category_type_id == null" class="button saveEntries" :data-category="category.id">💾</div>
-        <NuxtLink to="/entry/create" v-else class="button addEntry">➕</NuxtLink>
+        <div v-if="category.category_type_id == null" class="button saveEntries" :data-category="category.id"
+            @click="saveEntries">
+            <template v-if="!data.justSaved">💾</template>
+            <template v-else>✅</template>
+        </div>
+        <NuxtLink :to="`/entry/create/${categoryId}`" v-else class="button addEntry">➕</NuxtLink>
     </div>
 </template>
 
@@ -52,29 +56,36 @@ const categoryId = route.params.id
 
 await categoriesStore.getWithEntries(categoryId)
 const category = categoriesStore.categoryToEdit
-const entries = (category.entries.length ? category.entries : [{ value: 'First Entry', id: new Date().getTime(), url: '', image: '' }])
+const entries = (category.entries.length ? category.entries : [{ value: 'First Entry', id: new Date().getTime(), url: '', image: '', category_id: categoryId }])
 const data = reactive({
     activeEntryId: null,
     entries,
+    justSaved: false,
     similarEntries: []
 })
 const entryRefs = ref([])
-
-// Todo: move JS from Laravel
 
 const focusEntry = (entry) => {
     data.activeEntryId = entry.id
     data.similarEntries = []
 }
 
-const addNewEntry = (entry, event) => {
+const addNewEntry = async (entry, event) => {
     event.preventDefault()
     data.similarEntries = []
     const insertIndex = data.entries.indexOf(entry) + 1
-    data.entries.splice(insertIndex, 0, { value: '', id: new Date().getTime(), url: '', image: '' })
+    await data.entries.splice(insertIndex, 0, { value: '', id: new Date().getTime(), url: '', image: '', category_id: categoryId })
     entryRefs.value[insertIndex].focus()
-    // Todo: not working on first entry
     data.activeEntryId = data.entries[insertIndex].id
+}
+
+const saveEntries = async () => {
+    console.log(data.entries)
+    await entriesStore.updateAll(data.entries, categoryId)
+    data.justSaved = true
+    setTimeout(() => {
+        data.justSaved = false
+    }, 1000)
 }
 
 const removeEntry = (entry, event) => {
@@ -95,7 +106,6 @@ const findSimilarEntries = async (entry) => {
     } else {
         data.similarEntries = []
     }
-    console.log(data.similarEntries.length)
 }
 
 const webSearch = (entry) => {

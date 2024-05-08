@@ -6,13 +6,13 @@
             <div class="label">
                 Emoji
             </div>
-            <input type="text" name="emoji" maxlength="2" placeholder="" v-model="category.emoji">
+            <input type="text" name="emoji" maxlength="2" placeholder="" v-model="category.emoji" :class="{empty: !category.emoji}">
         </label>
         <label>
             <div class="label">
                 Name
             </div>
-            <input type="text" name="name" placeholder="" v-model="category.name">
+            <input type="text" name="name" placeholder="" v-model="category.name" :class="{empty: !category.name}">
         </label>
         <label>
             <div class="label">

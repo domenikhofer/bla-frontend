@@ -2,6 +2,7 @@ export const EntriesStore = defineStore('entries', {
   state: () => ({
     baseURL: useRuntimeConfig().public.apiBaseUrl,
     entries: [],
+    moviesTVShows: [],
   }),
   getters: {
     all(state) {
@@ -9,61 +10,36 @@ export const EntriesStore = defineStore('entries', {
     }
   },
   actions: {
-    // Todo: remove all unused
     async getSimilar(query, categoryId) {
       const response = await $fetch(`${this.baseURL}/entry/search?query=${query}&category_id=${categoryId}`)
-      this.entries = response.data 
+      this.entries = response.data
     },
-    async getAll() {
-      const response = await $fetch(`${this.baseURL}/category`)
-      this.categories = response.data
-    },
-    async get(id) {
-      const response = await $fetch(`${this.baseURL}/category/${id}`)
-      this.categoryToEdit = response.data
-    },
-    async getWithEntries(id) {
-      const response = await $fetch(`${this.baseURL}/category/${id}?withEntries=true`)
-      this.categoryToEdit = response.data
-    },
-    async getCategoryTypes() {
-      const response = await $fetch(`${this.baseURL}/category/types`)
-      this.categoryTypes = response.data
-    },
-    async add() {
-      const response = await $fetch(`${this.baseURL}/category`, {
+    async updateAll(entries, category_id) {
+      const response = await $fetch(`${this.baseURL}/entry`, {
         method: 'POST',
-        body: JSON.stringify(this.categoryToEdit),
+        body: JSON.stringify({
+          entries,
+          category_id
+        }),
       });
     },
-    async update() {
-      const response = await $fetch(`${this.baseURL}/category/${this.categoryToEdit.id}`, {
-        method: 'PATCH',
-        body: JSON.stringify(this.categoryToEdit),
-      });
-    },
-    async delete(data) {
-      if(this.categoryToDelete.parent_id){
-        const parentIndex = this.categories.findIndex(category => category.id === this.categoryToDelete.parent_id);
-        const index = this.categories[parentIndex].subcategories.findIndex(category => category.id === this.categoryToDelete.id);
-        if (index !== -1) {
-          this.categories[parentIndex].subcategories[index].deleted = true;
+    async findMovieTVShow(query) {
+      const options = {
+        method: 'GET',
+        headers: {
+          accept: 'application/json',
+          Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI1MDk5YmYwNzMyMjU5MGRiNjM2N2RkOTk3MzcwMDc2NSIsInN1YiI6IjY1ZjlhODM4MjRiMzMzMDE2MTdhNDM0MSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.O5HWEE0uBRS_WwNo0g4-TZKgKueV9aTyssQqXr6BNUM'
         }
-      }else{
-        const index = this.categories.findIndex(category => category.id === this.categoryToDelete.id);
-        if (index !== -1) {
-          this.categories[index].deleted = true;
-        }
-      } 
-      const response = await $fetch(this.baseURL + '/category/' + this.categoryToDelete.id, {
-        method: 'DELETE'
+      };
+      const response = await fetch(`https://api.themoviedb.org/3/search/multi?query=${query}`, options)
+      const results = await response.json();
+      this.moviesTVShows = results.results
+    },
+    async addMovieTVShow(data) {
+      const response = await $fetch(`${this.baseURL}/entry/store-media`, {
+        method: 'POST',
+        body: JSON.stringify(data),
       });
     },
-    async toggleModal(data) {
-      if(data){
-        this.categoryToDelete = data
-      }
-      this.showModal = !this.showModal
-    }
   },
 })
