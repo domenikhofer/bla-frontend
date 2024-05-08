@@ -1,6 +1,17 @@
-# Nuxt 3 Minimal Starter
+# BLA - BetterListApp (WIP)
 
-Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+## To-dos
+
+- movies can be deleted, edited or put on “watched” list
+- remove / move entries (archive?)
+- Backup möglichkeit automatisch
+- CH-Karte für Restis?
+- Make PWA + Widget?
+- location as a type?
+- entry/exit animation on pages?
+- prettier button interactions
+- better contrast between elements and background
+- error handling → duplicate movie entry / fetch error / ...
 
 ## Setup
 
@@ -73,3 +84,5 @@ bun run preview
 ```
 
 Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+
+Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
