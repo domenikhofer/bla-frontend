@@ -26,6 +26,8 @@
 
 <script setup>
 
+// Todo: move JS from Laravel
+
 const createMediaEntry = async (e) => {
     e.preventDefault()
 

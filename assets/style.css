@@ -456,7 +456,7 @@ select {
         }
 
         & .title {
-
+            all: unset;
             flex-grow: 1;
 
             &[contenteditable] {
@@ -472,7 +472,7 @@ select {
             transition: var(--transition);
         }
 
-        & .actions.active {
+        &.active .actions {
             opacity: 1;
             pointer-events: all;
         }
@@ -507,7 +507,7 @@ select {
             }
         }
 
-        &:focus-within .similar.active{
+        &.active:focus-within .similar{
             opacity: 1;
         }
 
