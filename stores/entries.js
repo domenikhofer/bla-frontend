@@ -1,7 +1,11 @@
 export const EntriesStore = defineStore('entries', {
   state: () => ({
     baseURL: useRuntimeConfig().public.apiBaseUrl,
+    showModal: false,
     entries: [],
+    currentEntry: {},
+    activeEntryId: null,
+    entryToDelete: null,
     moviesTVShows: [],
   }),
   getters: {
@@ -13,6 +17,16 @@ export const EntriesStore = defineStore('entries', {
     async getSimilar(query, categoryId) {
       const response = await $fetch(`${this.baseURL}/entry/search?query=${query}&category_id=${categoryId}`)
       this.entries = response.data
+    },
+    async get(id) {
+      const response = await $fetch(`${this.baseURL}/entry/${id}`)
+      this.currentEntry = response.data
+    },
+    async update(entry) {
+      const response = await $fetch(`${this.baseURL}/entry/${entry.id}`, {
+        method: 'PATCH',
+        body: JSON.stringify(entry),
+      });
     },
     async updateAll(entries, category_id) {
       const response = await $fetch(`${this.baseURL}/entry`, {
@@ -41,5 +55,16 @@ export const EntriesStore = defineStore('entries', {
         body: JSON.stringify(data),
       });
     },
+    async delete(data) {
+      const response = await $fetch(this.baseURL + '/entry/' + this.entryToDelete.id, {
+        method: 'DELETE'
+      });
+    },
+    async toggleModal(data) {
+      if (data) {
+        this.entryToDelete = data
+      }
+      this.showModal = !this.showModal
+    }
   },
 })

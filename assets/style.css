@@ -46,6 +46,12 @@ select {
     all: unset;
     color: inherit;
     box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+img {
+    display: block;
+    max-width: 100%;
 }
 
 form {
@@ -558,7 +564,20 @@ select {
             width: 100%;
             height: 100%;
             object-fit: cover;
+
+            &.active{
+                view-transition-name: media-thumbnail;
+                contain: layout;
+            }
         }
+    }
+}
+
+.singleEntry{
+    z-index: 1;
+
+    & img {
+        view-transition-name: media-thumbnail;
     }
 }
 

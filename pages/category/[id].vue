@@ -5,7 +5,7 @@
             <h1>{{ category.name }}</h1>
         </div>
         <div v-if="category.category_type_id == null" class="entryWrapper">
-            <div v-for="entry in data.entries" class="entry" :class="{ active: data.activeEntryId == entry.id }">
+            <div v-for="entry in data.entries" class="entry" :class="{ active: entriesStore.activeEntryId == entry.id }">
                 <input class="title" ref="entryRefs" @keyup="findSimilarEntries(entry)"
                     @keydown.enter="addNewEntry(entry, $event)" @keydown.delete="removeEntry(entry, $event)"
                     @click="focusEntry(entry)" contenteditable="true" spellcheck="false" v-model="entry.value">
@@ -26,11 +26,11 @@
 
         <div v-else class="imageEntryWrapper">
 
-            <a v-for="entry in category.entries" class="entry" :href="entry.url" target="_blank">
+            <NuxtLink v-for="entry in category.entries" class="entry" :to="`/entry/${entry.id}`" @click="entriesStore.activeEntryId = entry.id">
                 <span class="image">
-                    <img :src="`https://image.tmdb.org/t/p/w500/${entry.image}`" alt="">
+                    <img :src="`https://image.tmdb.org/t/p/w500/${entry.image}`" alt="" :class="{active: entriesStore.activeEntryId === entry.id }">
                 </span>
-            </a>
+            </NuxtLink>
 
         </div>
     </div>
@@ -58,7 +58,6 @@ await categoriesStore.getWithEntries(categoryId)
 const category = categoriesStore.categoryToEdit
 const entries = (category.entries.length ? category.entries : [{ value: 'First Entry', id: new Date().getTime(), url: '', image: '', category_id: categoryId }])
 const data = reactive({
-    activeEntryId: null,
     entries,
     justSaved: false,
     similarEntries: []
@@ -66,7 +65,7 @@ const data = reactive({
 const entryRefs = ref([])
 
 const focusEntry = (entry) => {
-    data.activeEntryId = entry.id
+    entriesStore.activeEntryId = entry.id
     data.similarEntries = []
 }
 
